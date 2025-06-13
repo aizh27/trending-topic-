@@ -1,5 +1,13 @@
+# Streamlit Web UI
 streamlit==1.45.0
+
+# LangChain Core and Community Tools (DDG, etc.)
 langchain==0.1.16
 langchain-community==0.0.35
+
+# Google Gemini Integration via LangChain
 langchain-google-genai==0.0.5
 google-generativeai==0.3.2
+
+# Optional fallback if LangChain DDG fails
+duckduckgo_search==0.9
