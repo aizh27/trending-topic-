@@ -6,11 +6,11 @@ from langchain_core.runnables import RunnablePassthrough
 import os
 
 # Set Gemini API key directly (avoid using .env as requested)
-GOOGLE_API_KEY = "your_google_api_key_here"
+GOOGLE_API_KEY = "AIzaSyAx4bAdsO3o41eCGiyKiZSgPjlPhNxNH9g"
 os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
 
 # Initialize LLM
-llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.7)
+llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash-lite", temperature=0.7)
 
 # Initialize DuckDuckGo search tool
 search = DuckDuckGoSearchResults()
