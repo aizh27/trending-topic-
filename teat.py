@@ -1,62 +1,41 @@
 import streamlit as st
-from langchain_community.tools.ddg_search.tool import DuckDuckGoSearchResults
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.prompts import ChatPromptTemplate
+import google.generativeai as genai
 import os
 
-# Set Gemini API key directly
+# Set your Google API Key
 GOOGLE_API_KEY = "AIzaSyAx4bAdsO3o41eCGiyKiZSgPjlPhNxNH9g"
-os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
+genai.configure(api_key=GOOGLE_API_KEY)
 
-# Initialize Gemini model (fixed model name)
-llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0.7)
-
-# Initialize DuckDuckGo search tool
-search_tool = DuckDuckGoSearchResults()
+# Load the Gemini model
+model = genai.GenerativeModel("gemini-2.0-flash")
 
 # Streamlit UI
-st.set_page_config(page_title="Trending Post Generator", page_icon="🔍")
-st.title("🚀 Trending Post Generator using Gemini & DuckDuckGo")
+st.set_page_config(page_title="Trending Post Generator", page_icon="📲")
+st.title("📈 Trending Post Generator with Gemini AI")
 
 # Input
 topic = st.text_input("Enter a Topic", placeholder="e.g. AI in Education")
 
-# Dropdown
+# Platform dropdown
 medium = st.selectbox("Select Platform", ["LinkedIn", "Instagram", "YouTube", "Twitter", "Threads"])
 
-# On Submit
-if st.button("Generate Trending Posts"):
+# Generate on button click
+if st.button("Generate Content"):
     if topic.strip() == "":
         st.warning("Please enter a topic.")
     else:
-        # Use LangChain-style invocation
-        results = search_tool.invoke(f"{topic} site:{medium.lower()}.com")
+        # Create a custom prompt
+        prompt = f"""
+        You're a trending social media strategist. Based on the topic "{topic}" and the platform "{medium}", 
+        suggest:
+        1. 3 trending post ideas with a title.
+        2. A short caption for each.
+        3. Relevant and catchy hashtags for each post.
+        Present the result in bullet points.
+        """
 
-        # Format search results
-        results_text = ""
-        for i, result in enumerate(results[:5], 1):
-            title = result.get("title", "No title")
-            link = result.get("link", "")
-            results_text += f"{i}. [{title}]({link})\n"
-
-        # Create prompt for Gemini
-        prompt = ChatPromptTemplate.from_template("""
-        Based on the topic "{topic}" and the platform "{medium}", here are some trending posts:
-        {results}
-        Generate relevant and catchy hashtags for these posts.
-        """)
-
-        chain = prompt | llm
-        output = chain.invoke({
-            "topic": topic,
-            "medium": medium,
-            "results": results_text
-        })
-
-        # Output in UI
-        st.success("Trending content & hashtags generated successfully!")
-        st.markdown("### 🔗 Trending Posts")
-        st.markdown(results_text, unsafe_allow_html=True)
-
-        st.markdown("### 🔥 Suggested Hashtags")
-        st.write(output.content)
+        # Get response from Gemini
+        response = model.generate_content(prompt)
+        st.success("Generated successfully!")
+        st.markdown("### 🚀 Suggested Posts & Hashtags")
+        st.write(response.text)
